@@ -97,7 +97,7 @@ CURL_TIMESTAMP = $(CURL_DIR)/timestamp
 CURL_TIMESTAMP_INT = $(ANDR_ROOT)/deps/curl_timestamp
 CURL_URL_HTTP = http://dl.uxnr.de/mirror/curl/curl-$(CURL_VERSION).tar.bz2
 
-FREETYPE_VERSION = 2.10.1
+FREETYPE_VERSION = 2.10.2
 FREETYPE_DIR = $(ANDR_ROOT)/deps/freetype
 FREETYPE_LIB = $(FREETYPE_DIR)/objs/.libs/libfreetype.a
 FREETYPE_TIMESTAMP = $(FREETYPE_DIR)/timestamp
