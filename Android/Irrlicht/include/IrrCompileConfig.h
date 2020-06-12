@@ -49,7 +49,7 @@
 #endif
 
 //! Comment this line to compile without the fallback console device.
-#define _IRR_COMPILE_WITH_CONSOLE_DEVICE_
+//#define _IRR_COMPILE_WITH_CONSOLE_DEVICE_
 #ifdef NO_IRR_COMPILE_WITH_CONSOLE_DEVICE_
 #undef _IRR_COMPILE_WITH_CONSOLE_DEVICE_
 #endif
@@ -195,7 +195,7 @@ If not defined, Windows Multimedia library is used, which offers also broad supp
 #endif
 
 //! enabled Direct3D 9
-#define _IRR_COMPILE_WITH_DIRECT3D_9_
+//#define _IRR_COMPILE_WITH_DIRECT3D_9_
 #ifdef NO_IRR_COMPILE_WITH_DIRECT3D_9_
 #undef _IRR_COMPILE_WITH_DIRECT3D_9_
 #endif
@@ -205,24 +205,34 @@ If not defined, Windows Multimedia library is used, which offers also broad supp
 //! Define _IRR_COMPILE_WITH_OPENGL_ to compile the Irrlicht engine with OpenGL.
 /** If you do not wish the engine to be compiled with OpenGL, comment this
 define out. */
-#define _IRR_COMPILE_WITH_OPENGL_
+//#define _IRR_COMPILE_WITH_OPENGL_
 #ifdef NO_IRR_COMPILE_WITH_OPENGL_
 #undef _IRR_COMPILE_WITH_OPENGL_
 #endif
 
 //! Define required options for OpenGL drivers.
 #if defined(_IRR_COMPILE_WITH_OPENGL_)
-#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-#define _IRR_OPENGL_USE_EXTPOINTER_
-#define _IRR_COMPILE_WITH_WGL_MANAGER_
-#elif defined(_IRR_COMPILE_WITH_X11_DEVICE_)
-#define _IRR_OPENGL_USE_EXTPOINTER_
-#define _IRR_COMPILE_WITH_GLX_MANAGER_
-#elif defined(_IRR_COMPILE_WITH_OSX_DEVICE_)
-#define _IRR_COMPILE_WITH_NSOGL_MANAGER_
-#elif defined(_IRR_SOLARIS_PLATFORM_)
-#define _IRR_COMPILE_WITH_GLX_MANAGER_
+	#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+		#define _IRR_OPENGL_USE_EXTPOINTER_
+		#define _IRR_COMPILE_WITH_WGL_MANAGER_
+	#elif defined(_IRR_COMPILE_WITH_X11_DEVICE_)
+		#define _IRR_OPENGL_USE_EXTPOINTER_
+		#define _IRR_COMPILE_WITH_GLX_MANAGER_
+	#elif defined(_IRR_COMPILE_WITH_OSX_DEVICE_)
+		#define _IRR_COMPILE_WITH_NSOGL_MANAGER_
+	#elif defined(_IRR_SOLARIS_PLATFORM_)
+		#define _IRR_COMPILE_WITH_GLX_MANAGER_
+	#elif defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+		#define _IRR_OPENGL_USE_EXTPOINTER_
+	#endif
 #endif
+
+
+// Debian 10 removed support for GLES1 in mesa.
+// Can't tell about other Linux platforms or a way to test if it's still available,
+// so removing OGLES1 support on Linux now to allow compiling to work by default.
+#if defined(_IRR_LINUX_PLATFORM_) && !defined(_IRR_ANDROID_PLATFORM_)
+#define NO_IRR_COMPILE_WITH_OGLES1_
 #endif
 
 //! Define _IRR_COMPILE_WITH_OGLES1_ to compile the Irrlicht engine with OpenGL ES 1.1.
@@ -257,7 +267,7 @@ define out. */
 
 //! Define _IRR_COMPILE_WITH_WEBGL1_ to compile Irrlicht engine with a WebGL friendly
 //! subset of the OpenGL ES 2.0 driver.
-#define _IRR_COMPILE_WITH_WEBGL1_
+//#define _IRR_COMPILE_WITH_WEBGL1_
 #ifdef NO_IRR_COMPILE_WITH_WEBGL1_
 #undef _IRR_COMPILE_WITH_WEBGL1_
 #endif
@@ -279,17 +289,19 @@ define out. */
 #endif
 #endif
 
+
+
 //! Define _IRR_COMPILE_WITH_SOFTWARE_ to compile the Irrlicht engine with software driver
 /** If you do not need the software driver, or want to use Burning's Video instead,
 comment this define out */
-#define _IRR_COMPILE_WITH_SOFTWARE_
+//#define _IRR_COMPILE_WITH_SOFTWARE_
 #ifdef NO_IRR_COMPILE_WITH_SOFTWARE_
 #undef _IRR_COMPILE_WITH_SOFTWARE_
 #endif
 
 //! Define _IRR_COMPILE_WITH_BURNINGSVIDEO_ to compile the Irrlicht engine with Burning's video driver
 /** If you do not need this software driver, you can comment this define out. */
-#define _IRR_COMPILE_WITH_BURNINGSVIDEO_
+//#define _IRR_COMPILE_WITH_BURNINGSVIDEO_
 #ifdef NO_IRR_COMPILE_WITH_BURNINGSVIDEO_
 #undef _IRR_COMPILE_WITH_BURNINGSVIDEO_
 #endif
@@ -361,7 +373,9 @@ the engine will no longer read .jpeg images. */
 
 //! Define _IRR_USE_NON_SYSTEM_JPEG_LIB_ to let irrlicht use the jpeglib which comes with irrlicht.
 /** If this is commented out, Irrlicht will try to compile using the jpeg lib installed in the system.
-	This is only used when _IRR_COMPILE_WITH_LIBJPEG_ is defined. */
+	This is only used when _IRR_COMPILE_WITH_LIBJPEG_ is defined.
+	NOTE: You will also have to modify the Makefile or project files when changing this default.
+	*/
 #define _IRR_USE_NON_SYSTEM_JPEG_LIB_
 #ifdef NO_IRR_USE_NON_SYSTEM_JPEG_LIB_
 #undef _IRR_USE_NON_SYSTEM_JPEG_LIB_
@@ -377,7 +391,9 @@ the engine will no longer read .png images. */
 
 //! Define _IRR_USE_NON_SYSTEM_LIBPNG_ to let irrlicht use the libpng which comes with irrlicht.
 /** If this is commented out, Irrlicht will try to compile using the libpng installed in the system.
-	This is only used when _IRR_COMPILE_WITH_LIBPNG_ is defined. */
+	This is only used when _IRR_COMPILE_WITH_LIBPNG_ is defined.
+	NOTE: You will also have to modify the Makefile or project files when changing this default.
+	*/
 #define _IRR_USE_NON_SYSTEM_LIB_PNG_
 #ifdef NO_IRR_USE_NON_SYSTEM_LIB_PNG_
 #undef _IRR_USE_NON_SYSTEM_LIB_PNG_
@@ -720,44 +736,44 @@ B3D, MS3D or X meshes */
 #endif
 
 //! Define _IRR_COMPILE_WITH_BMP_WRITER_ if you want to write .bmp files
-#define _IRR_COMPILE_WITH_BMP_WRITER_
+//#define _IRR_COMPILE_WITH_BMP_WRITER_
 #ifdef NO_IRR_COMPILE_WITH_BMP_WRITER_
 #undef _IRR_COMPILE_WITH_BMP_WRITER_
 #endif
 //! Define _IRR_COMPILE_WITH_JPG_WRITER_ if you want to write .jpg files
-#define _IRR_COMPILE_WITH_JPG_WRITER_
+//#define _IRR_COMPILE_WITH_JPG_WRITER_
 #ifdef NO_IRR_COMPILE_WITH_JPG_WRITER_
 #undef _IRR_COMPILE_WITH_JPG_WRITER_
 #endif
 //! Define _IRR_COMPILE_WITH_PCX_WRITER_ if you want to write .pcx files
-#define _IRR_COMPILE_WITH_PCX_WRITER_
+//#define _IRR_COMPILE_WITH_PCX_WRITER_
 #ifdef NO_IRR_COMPILE_WITH_PCX_WRITER_
 #undef _IRR_COMPILE_WITH_PCX_WRITER_
 #endif
 //! Define _IRR_COMPILE_WITH_PNG_WRITER_ if you want to write .png files
-#define _IRR_COMPILE_WITH_PNG_WRITER_
+//#define _IRR_COMPILE_WITH_PNG_WRITER_
 #ifdef NO_IRR_COMPILE_WITH_PNG_WRITER_
 #undef _IRR_COMPILE_WITH_PNG_WRITER_
 #endif
 //! Define _IRR_COMPILE_WITH_PPM_WRITER_ if you want to write .ppm files
-#define _IRR_COMPILE_WITH_PPM_WRITER_
+//#define _IRR_COMPILE_WITH_PPM_WRITER_
 #ifdef NO_IRR_COMPILE_WITH_PPM_WRITER_
 #undef _IRR_COMPILE_WITH_PPM_WRITER_
 #endif
 //! Define _IRR_COMPILE_WITH_PSD_WRITER_ if you want to write .psd files
-#define _IRR_COMPILE_WITH_PSD_WRITER_
+//#define _IRR_COMPILE_WITH_PSD_WRITER_
 #ifdef NO_IRR_COMPILE_WITH_PSD_WRITER_
 #undef _IRR_COMPILE_WITH_PSD_WRITER_
 #endif
 //! Define _IRR_COMPILE_WITH_TGA_WRITER_ if you want to write .tga files
-#define _IRR_COMPILE_WITH_TGA_WRITER_
+//#define _IRR_COMPILE_WITH_TGA_WRITER_
 #ifdef NO_IRR_COMPILE_WITH_TGA_WRITER_
 #undef _IRR_COMPILE_WITH_TGA_WRITER_
 #endif
 
 //! Define __IRR_COMPILE_WITH_ZIP_ARCHIVE_LOADER_ if you want to open ZIP and GZIP archives
 /** ZIP reading has several more options below to configure. */
-#define __IRR_COMPILE_WITH_ZIP_ARCHIVE_LOADER_
+//#define __IRR_COMPILE_WITH_ZIP_ARCHIVE_LOADER_
 #ifdef NO__IRR_COMPILE_WITH_ZIP_ARCHIVE_LOADER_
 #undef __IRR_COMPILE_WITH_ZIP_ARCHIVE_LOADER_
 #endif
@@ -766,20 +782,22 @@ B3D, MS3D or X meshes */
 /** This enables the engine to read from compressed .zip archives. If you
 disable this feature, the engine can still read archives, but only uncompressed
 ones. */
-#define _IRR_COMPILE_WITH_ZLIB_
+//#define _IRR_COMPILE_WITH_ZLIB_
 #ifdef NO_IRR_COMPILE_WITH_ZLIB_
 #undef _IRR_COMPILE_WITH_ZLIB_
 #endif
 //! Define _IRR_USE_NON_SYSTEM_ZLIB_ to let irrlicht use the zlib which comes with irrlicht.
 /** If this is commented out, Irrlicht will try to compile using the zlib
-installed on the system. This is only used when _IRR_COMPILE_WITH_ZLIB_ is
-defined. */
-#define _IRR_USE_NON_SYSTEM_ZLIB_
+	installed on the system. This is only used when _IRR_COMPILE_WITH_ZLIB_ is
+	defined.
+	NOTE: You will also have to modify the Makefile or project files when changing this default.
+ */
+//#define _IRR_USE_NON_SYSTEM_ZLIB_
 #ifdef NO_IRR_USE_NON_SYSTEM_ZLIB_
 #undef _IRR_USE_NON_SYSTEM_ZLIB_
 #endif
 //! Define _IRR_COMPILE_WITH_ZIP_ENCRYPTION_ if you want to read AES-encrypted ZIP archives
-#define _IRR_COMPILE_WITH_ZIP_ENCRYPTION_
+//#define _IRR_COMPILE_WITH_ZIP_ENCRYPTION_
 #ifdef NO_IRR_COMPILE_WITH_ZIP_ENCRYPTION_
 #undef _IRR_COMPILE_WITH_ZIP_ENCRYPTION_
 #endif
@@ -787,14 +805,16 @@ defined. */
 /** bzip2 is superior to the original zip file compression modes, but requires
 a certain amount of memory for decompression and adds several files to the
 library. */
-#define _IRR_COMPILE_WITH_BZIP2_
+//#define _IRR_COMPILE_WITH_BZIP2_
 #ifdef NO_IRR_COMPILE_WITH_BZIP2_
 #undef _IRR_COMPILE_WITH_BZIP2_
 #endif
 //! Define _IRR_USE_NON_SYSTEM_BZLIB_ to let irrlicht use the bzlib which comes with irrlicht.
 /** If this is commented out, Irrlicht will try to compile using the bzlib
 installed on the system. This is only used when _IRR_COMPILE_WITH_BZLIB_ is
-defined. */
+defined.
+NOTE: You will also have to modify the Makefile or project files when changing this default.
+*/
 #define _IRR_USE_NON_SYSTEM_BZLIB_
 #ifdef NO_IRR_USE_NON_SYSTEM_BZLIB_
 #undef _IRR_USE_NON_SYSTEM_BZLIB_
@@ -802,34 +822,34 @@ defined. */
 //! Define _IRR_COMPILE_WITH_LZMA_ if you want to use LZMA compressed zip files.
 /** LZMA is a very efficient compression code, known from 7zip. Irrlicht
 currently only supports zip archives, though. */
-#define _IRR_COMPILE_WITH_LZMA_
+//#define _IRR_COMPILE_WITH_LZMA_
 #ifdef NO_IRR_COMPILE_WITH_LZMA_
 #undef _IRR_COMPILE_WITH_LZMA_
 #endif
 #endif
 
 //! Define __IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_ if you want to mount folders as archives
-#define __IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_
+//#define __IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_
 #ifdef NO__IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_
 #undef __IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_
 #endif
 //! Define __IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_ if you want to open ID software PAK archives
-#define __IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_
+//#define __IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_
 #ifdef NO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_
 #undef __IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_
 #endif
 //! Define __IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_ if you want to open Nebula Device NPK archives
-#define __IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_
+//#define __IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_
 #ifdef NO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_
 #undef __IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_
 #endif
 //! Define __IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_ if you want to open TAR archives
-#define __IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_
+//#define __IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_
 #ifdef NO__IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_
 #undef __IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_
 #endif
 //! Define __IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_ if you want to open WAD archives
-#define __IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_
+//#define __IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_
 #ifdef NO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_
 #undef __IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_
 #endif
@@ -906,9 +926,8 @@ precision will be lower but speed higher. currently X86 only
 #if defined(__BORLANDC__)
 	#include <tchar.h>
 
-	// Borland 5.5.1 does not have _strcmpi defined
+	// Borland 5.5.1
 	#if __BORLANDC__ == 0x551
-	//    #define _strcmpi strcmpi
 		#undef _tfinddata_t
 		#undef _tfindfirst
 		#undef _tfindnext
