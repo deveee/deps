@@ -431,7 +431,7 @@ clean_irrlicht :
 	$(RM) -r ${IRRLICHT_DIR}
 
 $(MBEDTLS_TIMESTAMP) : mbedtls_download
-	@LAST_MODIF=$$(find ${MBEDTLS_DIR} -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" "); \
+	@LAST_MODIF=$$(find ${MBEDTLS_DIR} -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" ");\
 	if [ $$(basename $$LAST_MODIF) != "timestamp" ] ; then				\
 		touch ${MBEDTLS_TIMESTAMP};										\
 	fi
@@ -443,7 +443,7 @@ mbedtls_download :
 		cd ${ANDR_ROOT}/deps;											\
 		wget ${MBEDTLS_URL} || exit 1;									\
 		mkdir -p mbedtls;												\
-		tar -xzf mbedtls-${MBEDTLS_VERSION}.tar.gz -C mbedtls --strip=1; \
+		tar -xzf mbedtls-${MBEDTLS_VERSION}.tar.gz -C mbedtls --strip=1;\
 		$(RM) -r mbedtls-${MBEDTLS_VERSION}.tar.gz;						\
 	fi
 
@@ -528,8 +528,8 @@ $(CURL_LIB) : $(CURL_TIMESTAMP) $(MBEDTLS_LIB)
 	export TARGET_OS=OS_ANDROID_CROSSCOMPILE;							\
 	export CC=${CROSS_CC};												\
 	export TARGET_OS=OS_ANDROID_CROSSCOMPILE;							\
-	export CPPFLAGS="$${CPPFLAGS} -I${MBEDTLS_DIR}/build/include ${TARGET_CXXFLAGS_ADDON}"; \
-	export CFLAGS="$${CFLAGS} -I${MBEDTLS_DIR}/build/include ${TARGET_CFLAGS_ADDON}"; \
+	export CPPFLAGS="$${CPPFLAGS} -I${MBEDTLS_DIR}/build/include ${TARGET_CXXFLAGS_ADDON}";\
+	export CFLAGS="$${CFLAGS} -I${MBEDTLS_DIR}/build/include ${TARGET_CFLAGS_ADDON}";\
 	./configure --host=${TARGET_TOOLCHAIN} \
 		--with-mbedtls=${MBEDTLS_DIR}/build \
 		--disable-shared --enable-static --disable-debug				\
@@ -538,7 +538,7 @@ $(CURL_LIB) : $(CURL_TIMESTAMP) $(MBEDTLS_LIB)
 		--disable-proxy --disable-cookies --disable-crypto-auth			\
 		--disable-manual --disable-ares --disable-ftp					\
 		--disable-unix-sockets --without-libidn --without-librtmp		\
-		--without-ssl --disable-sspi --disable-ldap --disable-ldaps					\
+		--without-ssl --disable-sspi --disable-ldap --disable-ldaps		\
 		--disable-rtsp --disable-dict --disable-telnet --disable-tftp	\
 		--disable-pop3 --disable-imap --disable-smtp --disable-gopher	\
 		--disable-libcurl-option;										\
