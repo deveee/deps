@@ -55,12 +55,12 @@ APP_STL_LIB = libc++
 SHELL := /bin/bash
 ANDR_ROOT = $(shell pwd)
 
-LEVELDB_VERSION = 1.20
+LEVELDB_VERSION = 1.22
 LEVELDB_DIR = $(ANDR_ROOT)/deps/leveldb
 LEVELDB_LIB = $(LEVELDB_DIR)/out-static/libleveldb.a
 LEVELDB_TIMESTAMP = $(LEVELDB_DIR)/timestamp
 LEVELDB_TIMESTAMP_INT = $(ANDR_ROOT)/deps/leveldb_timestamp
-LEVELDB_URL = https://github.com/google/leveldb/archive/v$(LEVELDB_VERSION).zip
+LEVELDB_URL = https://github.com/google/leveldb/archive/$(LEVELDB_VERSION).zip
 
 OPENAL_VERSION = v1.19
 #OPENAL_VERSION = f5e0eef34db3a3ab94b61a2f99f84f078ba947e7 # Release 1.20.1 has a broken sound
@@ -257,9 +257,10 @@ leveldb_download :
 		mkdir -p ${ANDR_ROOT}/deps;										\
 		cd ${ANDR_ROOT}/deps ;											\
 		wget ${LEVELDB_URL} || exit 1;									\
-		unzip -q v${LEVELDB_VERSION}.zip || exit 1;						\
-		$(RM) -r v${LEVELDB_VERSION}.zip || exit 1;						\
+		unzip -q ${LEVELDB_VERSION}.zip || exit 1;						\
+		$(RM) -r ${LEVELDB_VERSION}.zip || exit 1;						\
 		mv leveldb-${LEVELDB_VERSION} leveldb || exit 1;				\
+		cd leveldb && mkdir -p build && cd build || exit 1;				\
 	fi
 
 leveldb : $(LEVELDB_LIB)
@@ -273,7 +274,7 @@ $(LEVELDB_LIB): $(LEVELDB_TIMESTAMP)
 	fi;																	\
 	if [ $$REFRESH -ne 0 ] ; then										\
 	echo "changed timestamp for leveldb detected building...";			\
-	cd ${LEVELDB_DIR};													\
+	cd ${LEVELDB_DIR}/build;											\
 	export TOOLCHAIN=${LEVELDB_DIR}/TOOLCHAIN;							\
 	${ANDROID_NDK}/build/tools/make_standalone_toolchain.py				\
 		--arch ${TARGET_ARCH}											\
@@ -281,13 +282,17 @@ $(LEVELDB_LIB): $(LEVELDB_TIMESTAMP)
 		--stl=${APP_STL_LIB}											\
 		--install-dir=$${TOOLCHAIN};									\
 	export PATH="$${TOOLCHAIN}/bin:$${PATH}";							\
+	export TARGET_OS=OS_ANDROID_CROSSCOMPILE;							\
 	export CC=${CROSS_CC};												\
 	export CXX=${CROSS_CXX};											\
-	export TARGET_OS=OS_ANDROID_CROSSCOMPILE;							\
 	export CPPFLAGS="$${CPPFLAGS} ${TARGET_CXXFLAGS_ADDON}";			\
 	export CFLAGS="$${CFLAGS} ${TARGET_CFLAGS_ADDON}";					\
 	export CXXFLAGS="$${CXXFLAGS} ${TARGET_CXXFLAGS_ADDON}";			\
-	$(MAKE) out-static/libleveldb.a -s || exit 1;						\
+	cmake -DCMAKE_BUILD_TYPE=Release -DLIBTYPE=STATIC					\
+		-DCMAKE_C_FLAGS="${TARGET_CFLAGS_ADDON}"						\
+		-DCMAKE_CXX_FLAGS="${TARGET_CXXFLAGS_ADDON} -fPIC"				\
+		-DHOST=${CROSS_PREFIX} -DCMAKE_FIND_ROOT_PATH=$${TOOLCHAIN} ..	\
+		&& cmake --build . || exit 1;									\
 	touch ${LEVELDB_TIMESTAMP};											\
 	touch ${LEVELDB_TIMESTAMP_INT};										\
 	$(RM) -r $${TOOLCHAIN};												\
@@ -533,11 +538,10 @@ $(CURL_LIB) : $(CURL_TIMESTAMP) $(MBEDTLS_LIB)
 	export PATH="$${TOOLCHAIN}/bin:$${PATH}";							\
 	export TARGET_OS=OS_ANDROID_CROSSCOMPILE;							\
 	export CC=${CROSS_CC};												\
-	export TARGET_OS=OS_ANDROID_CROSSCOMPILE;							\
 	export CPPFLAGS="$${CPPFLAGS} -I${MBEDTLS_DIR}/build/include ${TARGET_CXXFLAGS_ADDON}";\
 	export CFLAGS="$${CFLAGS} -I${MBEDTLS_DIR}/build/include ${TARGET_CFLAGS_ADDON}";\
-	./configure --host=${TARGET_TOOLCHAIN} \
-		--with-mbedtls=${MBEDTLS_DIR}/build \
+	./configure --host=${TARGET_TOOLCHAIN}								\
+		--with-mbedtls=${MBEDTLS_DIR}/build								\
 		--disable-shared --enable-static --disable-debug				\
 		--disable-verbose --disable-versioned-symbols					\
 		--enable-hidden-symbols --disable-dependency-tracking			\
