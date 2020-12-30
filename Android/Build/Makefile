@@ -90,12 +90,12 @@ MBEDTLS_TIMESTAMP = $(MBEDTLS_DIR)/timestamp
 MBEDTLS_TIMESTAMP_INT = $(ANDR_ROOT)/deps/mbedtls_timestamp
 MBEDTLS_URL = https://github.com/ARMmbed/mbedtls/archive/mbedtls-$(MBEDTLS_VERSION).tar.gz
 
-CURL_VERSION = 7.69.1
+CURL_VERSION = 7.74.0
 CURL_DIR = $(ANDR_ROOT)/deps/curl
 CURL_LIB = $(CURL_DIR)/lib/.libs/libcurl.a
 CURL_TIMESTAMP = $(CURL_DIR)/timestamp
 CURL_TIMESTAMP_INT = $(ANDR_ROOT)/deps/curl_timestamp
-CURL_URL_HTTP = http://dl.uxnr.de/mirror/curl/curl-$(CURL_VERSION).tar.bz2
+CURL_URL_HTTP = https://curl.se/download/curl-$(CURL_VERSION).tar.bz2
 
 FREETYPE_VERSION = 2.10.4
 FREETYPE_DIR = $(ANDR_ROOT)/deps/freetype
