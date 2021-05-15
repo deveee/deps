@@ -205,7 +205,7 @@ If not defined, Windows Multimedia library is used, which offers also broad supp
 //! Define _IRR_COMPILE_WITH_OPENGL_ to compile the Irrlicht engine with OpenGL.
 /** If you do not wish the engine to be compiled with OpenGL, comment this
 define out. */
-//#define _IRR_COMPILE_WITH_OPENGL_
+#define _IRR_COMPILE_WITH_OPENGL_
 #ifdef NO_IRR_COMPILE_WITH_OPENGL_
 #undef _IRR_COMPILE_WITH_OPENGL_
 #endif
@@ -227,20 +227,22 @@ define out. */
 	#endif
 #endif
 
-
-// Debian 10 removed support for GLES1 in mesa.
-// Can't tell about other Linux platforms or a way to test if it's still available,
-// so removing OGLES1 support on Linux now to allow compiling to work by default.
-#if defined(_IRR_LINUX_PLATFORM_) && !defined(_IRR_ANDROID_PLATFORM_)
-#define NO_IRR_COMPILE_WITH_OGLES1_
-#endif
-
 //! Define _IRR_COMPILE_WITH_OGLES1_ to compile the Irrlicht engine with OpenGL ES 1.1.
 /** If you do not wish the engine to be compiled with OpenGL ES 1.1, comment this
-define out. */
+define out.
+Currently only enabled on Android by default.
+Depending on platform you may have to enable _IRR_OGLES1_USE_KHRONOS_API_HEADERS_ as well when using it.
+*/
+#if defined(_IRR_ANDROID_PLATFORM_) || defined(_IRR_IOS_PLATFORM_)
 #define _IRR_COMPILE_WITH_OGLES1_
+#endif
 #ifdef NO_IRR_COMPILE_WITH_OGLES1_
 #undef _IRR_COMPILE_WITH_OGLES1_
+#endif
+
+#ifdef _IRR_COMPILE_WITH_OGLES1_
+//! Define _IRR_OGLES1_USE_KHRONOS_API_HEADERS_ to use the OpenGL ES headers from the Debian Khronos-api package
+//#define _IRR_OGLES1_USE_KHRONOS_API_HEADERS_
 #endif
 
 //! Define required options for OpenGL ES 1.1 drivers.
@@ -315,17 +317,21 @@ define out. */
 #undef _IRR_COMPILE_WITH_X11_
 #endif
 
-//! On some Linux systems the XF86 vidmode extension or X11 RandR are missing. Use these flags
-//! to remove the dependencies such that Irrlicht will compile on those systems, too.
-//! If you don't need colored cursors you can also disable the Xcursor extension
+//! On some Linux systems the XF86 vidmode extension, X11 RandR, or XInput2 are missing.
+//! Use these defines to add/remove support for those dependencies as needed.
+//! XInput2 (library called Xi) is currently only used to support touch-input.
 #if defined(_IRR_LINUX_PLATFORM_) && defined(_IRR_COMPILE_WITH_X11_)
 #define _IRR_LINUX_X11_VIDMODE_
 //#define _IRR_LINUX_X11_RANDR_
+//#define _IRR_LINUX_X11_XINPUT2_
 #ifdef NO_IRR_LINUX_X11_VIDMODE_
 #undef _IRR_LINUX_X11_VIDMODE_
 #endif
 #ifdef NO_IRR_LINUX_X11_RANDR_
 #undef _IRR_LINUX_X11_RANDR_
+#endif
+#ifdef NO_IRR_LINUX_X11_XINPUT2_
+#undef _IRR_LINUX_X11_XINPUT2_
 #endif
 
 //! X11 has by default only monochrome cursors, but using the Xcursor library we can also get color cursor support.
@@ -773,7 +779,7 @@ B3D, MS3D or X meshes */
 
 //! Define __IRR_COMPILE_WITH_ZIP_ARCHIVE_LOADER_ if you want to open ZIP and GZIP archives
 /** ZIP reading has several more options below to configure. */
-//#define __IRR_COMPILE_WITH_ZIP_ARCHIVE_LOADER_
+#define __IRR_COMPILE_WITH_ZIP_ARCHIVE_LOADER_
 #ifdef NO__IRR_COMPILE_WITH_ZIP_ARCHIVE_LOADER_
 #undef __IRR_COMPILE_WITH_ZIP_ARCHIVE_LOADER_
 #endif
@@ -782,7 +788,7 @@ B3D, MS3D or X meshes */
 /** This enables the engine to read from compressed .zip archives. If you
 disable this feature, the engine can still read archives, but only uncompressed
 ones. */
-//#define _IRR_COMPILE_WITH_ZLIB_
+#define _IRR_COMPILE_WITH_ZLIB_
 #ifdef NO_IRR_COMPILE_WITH_ZLIB_
 #undef _IRR_COMPILE_WITH_ZLIB_
 #endif
@@ -792,12 +798,12 @@ ones. */
 	defined.
 	NOTE: You will also have to modify the Makefile or project files when changing this default.
  */
-//#define _IRR_USE_NON_SYSTEM_ZLIB_
+#define _IRR_USE_NON_SYSTEM_ZLIB_
 #ifdef NO_IRR_USE_NON_SYSTEM_ZLIB_
 #undef _IRR_USE_NON_SYSTEM_ZLIB_
 #endif
 //! Define _IRR_COMPILE_WITH_ZIP_ENCRYPTION_ if you want to read AES-encrypted ZIP archives
-//#define _IRR_COMPILE_WITH_ZIP_ENCRYPTION_
+#define _IRR_COMPILE_WITH_ZIP_ENCRYPTION_
 #ifdef NO_IRR_COMPILE_WITH_ZIP_ENCRYPTION_
 #undef _IRR_COMPILE_WITH_ZIP_ENCRYPTION_
 #endif
@@ -805,7 +811,7 @@ ones. */
 /** bzip2 is superior to the original zip file compression modes, but requires
 a certain amount of memory for decompression and adds several files to the
 library. */
-//#define _IRR_COMPILE_WITH_BZIP2_
+#define _IRR_COMPILE_WITH_BZIP2_
 #ifdef NO_IRR_COMPILE_WITH_BZIP2_
 #undef _IRR_COMPILE_WITH_BZIP2_
 #endif
@@ -822,7 +828,7 @@ NOTE: You will also have to modify the Makefile or project files when changing t
 //! Define _IRR_COMPILE_WITH_LZMA_ if you want to use LZMA compressed zip files.
 /** LZMA is a very efficient compression code, known from 7zip. Irrlicht
 currently only supports zip archives, though. */
-//#define _IRR_COMPILE_WITH_LZMA_
+#define _IRR_COMPILE_WITH_LZMA_
 #ifdef NO_IRR_COMPILE_WITH_LZMA_
 #undef _IRR_COMPILE_WITH_LZMA_
 #endif
@@ -844,7 +850,7 @@ currently only supports zip archives, though. */
 #undef __IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_
 #endif
 //! Define __IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_ if you want to open TAR archives
-//#define __IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_
+#define __IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_
 #ifdef NO__IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_
 #undef __IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_
 #endif
@@ -958,4 +964,3 @@ precision will be lower but speed higher. currently X86 only
 #endif
 
 #endif // __IRR_COMPILE_CONFIG_H_INCLUDED__
-
