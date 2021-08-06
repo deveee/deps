@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 . sdk.sh
-CURL_VERSION=7.76.1
+CURL_VERSION=7.78.0
 
 mkdir -p deps; cd deps
 

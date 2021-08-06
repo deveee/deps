@@ -18,7 +18,7 @@ fi
 
 echo "ndk.dir = $ANDROID_NDK" > local.properties
 
-if  $ARM32 ; then
+if $ARM32 ; then
 	### toolchain config for ARMv7
 	export API=16
 	export TARGET_ABI=armeabi-v7a
@@ -42,11 +42,11 @@ echo "Configured for $TARGET_ABI"
 
 case "$OSTYPE" in
 	linux*)
- 		export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/linux-x86_64
+		export TOOLCHAIN=$ANDROID_NDK/toolchains/llvm/prebuilt/linux-x86_64
 		echo "Configured for Linux" ;;
 	darwin*)
-  	export TOOLCHAIN=$ANDROID_NDK/toolchains/llvm/prebuilt/darwin-x86_64
-  	echo "Configured for Mac OS" ;;
+		export TOOLCHAIN=$ANDROID_NDK/toolchains/llvm/prebuilt/darwin-x86_64
+		echo "Configured for Mac OS" ;;
   	*)
   		echo "Just use right OS instead $OSTYPE"
   		exit 1 ;;
@@ -54,3 +54,6 @@ esac
 
 export CC=$TOOLCHAIN/bin/$TARGET$API-clang
 export CXX=$TOOLCHAIN/bin/$TARGET$API-clang++
+export LD=$TOOLCHAIN/bin/ld
+export RANLIB=$TOOLCHAIN/bin/llvm-ranlib
+export STRIP=$TOOLCHAIN/bin/llvm-strip
