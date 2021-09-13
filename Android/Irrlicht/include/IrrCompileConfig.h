@@ -2,8 +2,8 @@
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
-#ifndef __IRR_COMPILE_CONFIG_H_INCLUDED__
-#define __IRR_COMPILE_CONFIG_H_INCLUDED__
+#ifndef IRR_COMPILE_CONFIG_H_INCLUDED
+#define IRR_COMPILE_CONFIG_H_INCLUDED
 
 //! Irrlicht SDK Version
 #define IRRLICHT_VERSION_MAJOR 1
@@ -369,7 +369,7 @@ for Windows based systems. You also have to set #define UNICODE for this to comp
 #undef _IRR_WCHAR_FILESYSTEM
 #endif
 
-//! Define _IRR_COMPILE_WITH_JPEGLIB_ to enable compiling the engine using libjpeg.
+//! Define _IRR_COMPILE_WITH_LIBJPEG_ to enable compiling the engine using libjpeg.
 /** This enables the engine to read jpeg images. If you comment this out,
 the engine will no longer read .jpeg images. */
 #define _IRR_COMPILE_WITH_LIBJPEG_
@@ -963,4 +963,4 @@ precision will be lower but speed higher. currently X86 only
 	#endif
 #endif
 
-#endif // __IRR_COMPILE_CONFIG_H_INCLUDED__
+#endif // IRR_COMPILE_CONFIG_H_INCLUDED

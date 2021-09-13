@@ -7,7 +7,7 @@
 #TARGET_ABI = armeabi-v7a
 #TARGET_ARCH = arm
 #TARGET_TOOLCHAIN = arm-linux-androideabi
-#TARGET_CFLAGS_ADDON = -mthumb -Ofast -fdata-sections -ffunction-sections -fvisibility=hidden -fexceptions -D__ANDROID_API__=$(API)
+#TARGET_CFLAGS_ADDON = -mthumb -Ofast -fdata-sections -ffunction-sections -fvisibility=hidden -fexceptions -D__ANDROID_MIN_SDK_VERSION__=$(API)
 #TARGET_CXXFLAGS_ADDON = $(TARGET_CFLAGS_ADDON) -frtti
 #CROSS_PREFIX = arm-linux-androideabi
 #HOST_CC = "gcc -m32" # required for LuaJIT
@@ -21,7 +21,7 @@ TARGET_HOST = arm-linux
 TARGET_ABI = arm64-v8a
 TARGET_ARCH = arm64
 TARGET_TOOLCHAIN = aarch64-linux-android
-TARGET_CFLAGS_ADDON = -Ofast -fvisibility=hidden -fexceptions -D__ANDROID_API__=$(API)
+TARGET_CFLAGS_ADDON = -Ofast -fvisibility=hidden -fexceptions -D__ANDROID_MIN_SDK_VERSION__=$(API)
 TARGET_CXXFLAGS_ADDON = $(TARGET_CFLAGS_ADDON) -frtti
 CROSS_PREFIX = aarch64-linux-android
 HOST_CC = "gcc -m64" # required for LuaJIT
@@ -35,7 +35,7 @@ HOST_CC = "gcc -m64" # required for LuaJIT
 #TARGET_ABI = x86
 #TARGET_ARCH = x86
 #TARGET_TOOLCHAIN = x86
-#TARGET_CFLAGS_ADDON = -march=i686 -mtune=intel -mssse3 -mfpmath=sse -m32 -Ofast -funroll-loops -fdata-sections -ffunction-sections -fvisibility=hidden -fexceptions -D__ANDROID_API__=$(API)
+#TARGET_CFLAGS_ADDON = -march=i686 -mtune=intel -mssse3 -mfpmath=sse -m32 -Ofast -funroll-loops -fdata-sections -ffunction-sections -fvisibility=hidden -fexceptions -D__ANDROID_MIN_SDK_VERSION__=$(API)
 #TARGET_CXXFLAGS_ADDON = $(TARGET_CFLAGS_ADDON) -frtti
 #CROSS_PREFIX = i686-linux-android
 #HOST_CC = "gcc -m32" # required for LuaJIT
