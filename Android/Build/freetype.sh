@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 . sdk.sh
-FREETYPE_VERSION=2.11.0
+FREETYPE_VERSION=2.11.1
 
 mkdir -p deps; cd deps
 
@@ -28,4 +28,4 @@ rm -rf ../../../Freetype/include/dlg
 rm -rf ../../../Freetype/clang/$TARGET_ABI/libfreetype.a
 cp -r objs/.libs/libfreetype.a ../../../Freetype/clang/$TARGET_ABI/libfreetype.a
 
-echo "libcurl build successful"
+echo "Freetype build successful"
