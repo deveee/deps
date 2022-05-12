@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 . sdk.sh
-FREETYPE_VERSION=2.11.1
+FREETYPE_VERSION=2.12.1
 
 mkdir -p deps; cd deps
 
