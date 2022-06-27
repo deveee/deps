@@ -90,7 +90,7 @@ MBEDTLS_TIMESTAMP = $(MBEDTLS_DIR)/timestamp
 MBEDTLS_TIMESTAMP_INT = $(ANDR_ROOT)/deps/mbedtls_timestamp
 MBEDTLS_URL = https://github.com/ARMmbed/mbedtls/archive/mbedtls-$(MBEDTLS_VERSION).tar.gz
 
-CURL_VERSION = 7.74.0
+CURL_VERSION = 7.84.0
 CURL_DIR = $(ANDR_ROOT)/deps/curl
 CURL_LIB = $(CURL_DIR)/lib/.libs/libcurl.a
 CURL_TIMESTAMP = $(CURL_DIR)/timestamp
