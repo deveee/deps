@@ -2,12 +2,12 @@
 # toolchain config for ARMv7 (Clang)
 ######################################################################################
 
-#API = 16
+#API = 21
 #TARGET_HOST = arm-linux
 #TARGET_ABI = armeabi-v7a
 #TARGET_ARCH = arm
 #TARGET_TOOLCHAIN = arm-linux-androideabi
-#TARGET_CFLAGS_ADDON = -mthumb -Ofast -fdata-sections -ffunction-sections -fvisibility=hidden -fexceptions -D__ANDROID_MIN_SDK_VERSION__=$(API)
+#TARGET_CFLAGS_ADDON = -Ofast -fvisibility=hidden -fexceptions -D__ANDROID_MIN_SDK_VERSION__=$(API)
 #TARGET_CXXFLAGS_ADDON = $(TARGET_CFLAGS_ADDON) -frtti
 #CROSS_PREFIX = arm-linux-androideabi
 #HOST_CC = "gcc -m32" # required for LuaJIT
@@ -89,13 +89,6 @@ CURL_TIMESTAMP = $(CURL_DIR)/timestamp
 CURL_TIMESTAMP_INT = $(ANDR_ROOT)/deps/curl_timestamp
 CURL_URL_HTTP = https://curl.se/download/curl-$(CURL_VERSION).tar.bz2
 
-FREETYPE_VERSION = 2.10.4
-FREETYPE_DIR = $(ANDR_ROOT)/deps/freetype
-FREETYPE_LIB = $(FREETYPE_DIR)/objs/.libs/libfreetype.a
-FREETYPE_TIMESTAMP = $(FREETYPE_DIR)/timestamp
-FREETYPE_TIMESTAMP_INT = $(ANDR_ROOT)/deps/freetype_timestamp
-FREETYPE_URL_HTTP = https://sourceforge.net/projects/freetype/files/freetype2/$(FREETYPE_VERSION)/freetype-$(FREETYPE_VERSION).tar.xz
-
 ICONV_VERSION = 1.16
 ICONV_DIR = $(ANDR_ROOT)/deps/libiconv
 ICONV_URL_HTTP = https://ftp.gnu.org/pub/gnu/libiconv/libiconv-$(ICONV_VERSION).tar.gz
@@ -115,14 +108,16 @@ GETTEXT_TIMESTAMP_INT = $(ANDR_ROOT)/deps/gettext_timestamp
 GETTEXT_URL = https://ftp.gnu.org/pub/gnu/gettext/gettext-$(GETTEXT_VERSION).tar.gz
 ######################################################################################
 
+NDK_VER = 23.2.8568313
+
 ANDROID_NDK = $(shell grep '^ndk\.dir' local.properties | sed 's/^.*=[[:space:]]*//')
 
 release : local.properties
 	$(MAKE) deps
 
 local.properties:
-	@if [ -d ${ANDROID_SDK_ROOT}/ndk-bundle ] ; then					\
-		export ANDROID_NDK=${ANDROID_SDK_ROOT}/ndk-bundle;				\
+	@if [ -d ${ANDROID_SDK_ROOT}/ndk/${NDK_VER} ] ; then				\
+		export ANDROID_NDK=${ANDROID_SDK_ROOT}/ndk/${NDK_VER};			\
 	else																\
 		echo "Please specify path of ANDROID NDK";						\
 		echo "e.g. $$HOME/Android/android-ndk-r21";						\
@@ -235,67 +230,6 @@ $(LEVELDB_LIB): $(LEVELDB_TIMESTAMP)
 
 clean_leveldb :
 	$(RM) -r ${LEVELDB_DIR}
-
-$(FREETYPE_TIMESTAMP) : freetype_download
-	@LAST_MODIF=$$(find ${FREETYPE_DIR} -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" ");\
-	if [ $$(basename $$LAST_MODIF) != "timestamp" ] ; then				\
-		touch ${FREETYPE_TIMESTAMP};									\
-	fi
-
-freetype_download :
-	@if [ ! -d ${FREETYPE_DIR} ] ; then									\
-		echo "freetype sources missing, downloading...";				\
-		mkdir -p ${ANDR_ROOT}/deps;										\
-		cd deps;														\
-		mkdir freetype;													\
-		wget ${FREETYPE_URL_HTTP} || exit 1;							\
-		tar -xJf freetype-${FREETYPE_VERSION}.tar.xz -C freetype		\
-			--strip-components=1 || exit 1;								\
-		$(RM) -r freetype-${FREETYPE_VERSION}.tar.xz;					\
-	fi
-
-freetype : $(FREETYPE_LIB)
-
-$(FREETYPE_LIB) : $(FREETYPE_TIMESTAMP)
-	+@REFRESH=0;														\
-	if [ ! -e ${FREETYPE_TIMESTAMP_INT} ] ; then						\
-		REFRESH=1;														\
-	fi;																	\
-	if [ ! -e ${FREETYPE_LIB} ] ; then									\
-		REFRESH=1;														\
-	fi;																	\
-	if [ ${FREETYPE_TIMESTAMP} -nt ${FREETYPE_TIMESTAMP_INT} ] ; then	\
-		REFRESH=1;														\
-	fi;																	\
-	if [ $$REFRESH -ne 0 ] ; then										\
-	export PATH=$$PATH:${ANDROID_NDK};									\
-	echo "changed timestamp for freetype detected building...";			\
-	cd ${FREETYPE_DIR};													\
-	export TOOLCHAIN=${FREETYPE_DIR}/TOOLCHAIN;							\
-	${ANDROID_NDK}/build/tools/make_standalone_toolchain.py				\
-		--arch ${TARGET_ARCH}											\
-		--api ${API}													\
-		--stl=${APP_STL_LIB}											\
-		--install-dir=$${TOOLCHAIN};									\
-	export PATH="$${TOOLCHAIN}/bin:$${PATH}";							\
-	export TARGET_OS=OS_ANDROID_CROSSCOMPILE;							\
-	export CFLAGS="$${CFLAGS} ${TARGET_CFLAGS_ADDON}";					\
-	export CPPFLAGS="$${CPPFLAGS} ${TARGET_CXXFLAGS_ADDON} -fPIC";		\
-	CC=${CROSS_CC} ./configure --host=${TARGET_TOOLCHAIN}				\
-		--enable-static --disable-shared --with-zlib=yes				\
-		--with-bzip2=no --with-png=no --with-harfbuzz=no				\
-		--prefix=$${TOOLCHAIN} || exit 1;								\
-	CC=${CROSS_CC} ANDROID_DEV=$${TOOLCHAIN}							\
-		$(MAKE) -s || exit 1;											\
-	touch ${FREETYPE_TIMESTAMP};										\
-	touch ${FREETYPE_TIMESTAMP_INT};									\
-	$(RM) -r $${TOOLCHAIN};												\
-	else																\
-		echo "nothing to be done for freetype";							\
-	fi
-
-clean_freetype :
-	$(RM) -r ${FREETYPE_DIR}
 
 iconv_download :
 	@if [ ! -d ${ICONV_DIR} ] ; then									\
@@ -601,7 +535,7 @@ $(GETTEXT_LIB): $(GETTEXT_TIMESTAMP)
 clean_getttext :
 	$(RM) -r ${GETTEXT_DIR}
 
-deps : $(IRRLICHT_LIB) $(FREETYPE_LIB) $(CURL_LIB) $(LEVELDB_LIB)		\
+deps : $(IRRLICHT_LIB) $(CURL_LIB) $(LEVELDB_LIB)		\
 	$(LUAJIT_LIB) $(VORBIS_LIB) $(MBEDTLS_LIB) iconv_download
 
 clean_all :

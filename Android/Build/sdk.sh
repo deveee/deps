@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-ARM32=FALSE
+ARM32=false
 
 export ANDROID_NDK="$(grep '^ndk\.dir' local.properties | sed 's/^.*=[[:space:]]*//')"
 
@@ -24,7 +24,7 @@ if $ARM32 ; then
 	export TARGET_ABI=armeabi-v7a
 	export ANDROID_ABI="$TARGET_ABI with NEON"
 	export TARGET=armv7a-linux-androideabi
-	export CFLAGS="-Ofast -fdata-sections -ffunction-sections -fvisibility=hidden -fexceptions -D__ANDROID_MIN_SDK_VERSION__=$API"
+	export CFLAGS="-Ofast -fvisibility=hidden -fexceptions -D__ANDROID_MIN_SDK_VERSION__=$API"
 	export CXXFLAGS="$CFLAGS -frtti"
 else
 	### toolchain config for ARM64
