@@ -55,12 +55,6 @@ APP_STL_LIB = libc++
 SHELL := /bin/bash
 ANDR_ROOT = $(shell pwd)
 
-VORBIS_DIR = $(ANDR_ROOT)/deps/libvorbis-android
-VORBIS_LIB = $(VORBIS_DIR)/obj/local/$(TARGET_ABI)/libvorbis.a
-VORBIS_TIMESTAMP = $(VORBIS_DIR)/timestamp
-VORBIS_TIMESTAMP_INT = $(ANDR_ROOT)/deps/vorbis_timestamp
-VORBIS_URL_GIT = https://github.com/MoNTE48/libvorbis-android
-
 IRRLICHT_BRANCH = ogl-es
 IRRLICHT_DIR = $(ANDR_ROOT)/deps/irrlicht
 IRRLICHT_LIB = $(IRRLICHT_DIR)/lib/Android/libIrrlicht.a
@@ -121,50 +115,6 @@ local.properties:
 		exit 1;															\
 	fi;																	\
 	echo "ndk.dir = $$ANDROID_NDK" > local.properties
-
-$(VORBIS_TIMESTAMP) : vorbis_download
-	@LAST_MODIF=$$(find ${VORBIS_DIR} -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" ");\
-	if [ $$(basename $$LAST_MODIF) != "timestamp" ] ; then				\
-		touch ${VORBIS_TIMESTAMP};										\
-	fi
-
-vorbis_download :
-	@if [ ! -d ${VORBIS_DIR} ] ; then									\
-		echo "vorbis sources missing, downloading...";					\
-		mkdir -p ${ANDR_ROOT}/deps;										\
-		cd ${ANDR_ROOT}/deps ;											\
-		git clone ${VORBIS_URL_GIT} || exit 1;							\
-	fi
-
-vorbis : $(VORBIS_LIB)
-
-$(VORBIS_LIB) : $(VORBIS_TIMESTAMP)
-	+@REFRESH=0;														\
-	if [ ! -e ${VORBIS_TIMESTAMP_INT} ] ; then							\
-		echo "${VORBIS_TIMESTAMP_INT} doesn't exist";					\
-		REFRESH=1;														\
-	fi;																	\
-	if [ ${VORBIS_TIMESTAMP} -nt ${VORBIS_TIMESTAMP_INT} ] ; then		\
-		REFRESH=1;														\
-	fi;																	\
-	if [ $$REFRESH -ne 0 ] ; then										\
-	echo "changed timestamp for vorbis detected building...";			\
-	cd ${VORBIS_DIR};													\
-	${ANDROID_NDK}/ndk-build											\
-		NDEBUG=1														\
-		APP_PLATFORM=android-${API}										\
-		TARGET_ABI=${TARGET_ABI}										\
-		APP_STL=${APP_STL}												\
-		COMPILER_VERSION=${COMPILER_VERSION}							\
-		NDK_APPLICATION_MK=${ANDR_ROOT}/Deps.mk || exit 1;				\
-	touch ${VORBIS_TIMESTAMP};											\
-	touch ${VORBIS_TIMESTAMP_INT};										\
-	else																\
-		echo "nothing to be done for libvorbis";						\
-	fi
-
-clean_vorbis :
-	$(RM) -r ${VORBIS_DIR}
 
 iconv_download :
 	@if [ ! -d ${ICONV_DIR} ] ; then									\
@@ -470,7 +420,7 @@ $(GETTEXT_LIB): $(GETTEXT_TIMESTAMP)
 clean_getttext :
 	$(RM) -r ${GETTEXT_DIR}
 
-deps : $(IRRLICHT_LIB) $(CURL_LIB) $(LUAJIT_LIB) $(VORBIS_LIB) $(MBEDTLS_LIB) iconv_download
+deps : $(IRRLICHT_LIB) $(CURL_LIB) $(LUAJIT_LIB) $(MBEDTLS_LIB) iconv_download
 
 clean_all :
 	$(RM) -r deps
