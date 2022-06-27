@@ -55,13 +55,6 @@ APP_STL_LIB = libc++
 SHELL := /bin/bash
 ANDR_ROOT = $(shell pwd)
 
-LEVELDB_VERSION = 1.22
-LEVELDB_DIR = $(ANDR_ROOT)/deps/leveldb
-LEVELDB_LIB = $(LEVELDB_DIR)/out-static/libleveldb.a
-LEVELDB_TIMESTAMP = $(LEVELDB_DIR)/timestamp
-LEVELDB_TIMESTAMP_INT = $(ANDR_ROOT)/deps/leveldb_timestamp
-LEVELDB_URL = https://github.com/google/leveldb/archive/$(LEVELDB_VERSION).zip
-
 VORBIS_DIR = $(ANDR_ROOT)/deps/libvorbis-android
 VORBIS_LIB = $(VORBIS_DIR)/obj/local/$(TARGET_ABI)/libvorbis.a
 VORBIS_TIMESTAMP = $(VORBIS_DIR)/timestamp
@@ -172,64 +165,6 @@ $(VORBIS_LIB) : $(VORBIS_TIMESTAMP)
 
 clean_vorbis :
 	$(RM) -r ${VORBIS_DIR}
-
-$(LEVELDB_TIMESTAMP) : leveldb_download
-	@LAST_MODIF=$$(find ${LEVELDB_DIR} -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" ");\
-	if [ $$(basename $$LAST_MODIF) != "timestamp" ] ; then				\
-		touch ${LEVELDB_TIMESTAMP};										\
-	fi
-
-leveldb_download :
-	@if [ ! -d ${LEVELDB_DIR} ] ; then									\
-		echo "leveldb sources missing, downloading...";					\
-		mkdir -p ${ANDR_ROOT}/deps;										\
-		cd ${ANDR_ROOT}/deps ;											\
-		wget ${LEVELDB_URL} || exit 1;									\
-		unzip -q ${LEVELDB_VERSION}.zip || exit 1;						\
-		$(RM) -r ${LEVELDB_VERSION}.zip || exit 1;						\
-		mv leveldb-${LEVELDB_VERSION} leveldb || exit 1;				\
-		cd leveldb && mkdir -p build && cd build || exit 1;				\
-	fi
-
-leveldb : $(LEVELDB_LIB)
-$(LEVELDB_LIB): $(LEVELDB_TIMESTAMP)
-	@REFRESH=0;															\
-	if [ ! -e ${LEVELDB_TIMESTAMP_INT} ] ; then							\
-		REFRESH=1;														\
-	fi;																	\
-	if [ ${LEVELDB_TIMESTAMP} -nt ${LEVELDB_TIMESTAMP_INT} ] ; then		\
-		REFRESH=1;														\
-	fi;																	\
-	if [ $$REFRESH -ne 0 ] ; then										\
-	echo "changed timestamp for leveldb detected building...";			\
-	cd ${LEVELDB_DIR}/build;											\
-	export TOOLCHAIN=${LEVELDB_DIR}/TOOLCHAIN;							\
-	${ANDROID_NDK}/build/tools/make_standalone_toolchain.py				\
-		--arch ${TARGET_ARCH}											\
-		--api ${API}													\
-		--stl=${APP_STL_LIB}											\
-		--install-dir=$${TOOLCHAIN};									\
-	export PATH="$${TOOLCHAIN}/bin:$${PATH}";							\
-	export TARGET_OS=OS_ANDROID_CROSSCOMPILE;							\
-	export CC=${CROSS_CC};												\
-	export CXX=${CROSS_CXX};											\
-	export CPPFLAGS="$${CPPFLAGS} ${TARGET_CXXFLAGS_ADDON}";			\
-	export CFLAGS="$${CFLAGS} ${TARGET_CFLAGS_ADDON}";					\
-	export CXXFLAGS="$${CXXFLAGS} ${TARGET_CXXFLAGS_ADDON}";			\
-	cmake -DCMAKE_BUILD_TYPE=Release -DLIBTYPE=STATIC					\
-		-DCMAKE_C_FLAGS="${TARGET_CFLAGS_ADDON}"						\
-		-DCMAKE_CXX_FLAGS="${TARGET_CXXFLAGS_ADDON} -fPIC"				\
-		-DHOST=${CROSS_PREFIX} -DCMAKE_FIND_ROOT_PATH=$${TOOLCHAIN} ..	\
-		&& cmake --build . || exit 1;									\
-	touch ${LEVELDB_TIMESTAMP};											\
-	touch ${LEVELDB_TIMESTAMP_INT};										\
-	$(RM) -r $${TOOLCHAIN};												\
-	else																\
-		echo "nothing to be done for leveldb";							\
-	fi
-
-clean_leveldb :
-	$(RM) -r ${LEVELDB_DIR}
 
 iconv_download :
 	@if [ ! -d ${ICONV_DIR} ] ; then									\
@@ -535,8 +470,7 @@ $(GETTEXT_LIB): $(GETTEXT_TIMESTAMP)
 clean_getttext :
 	$(RM) -r ${GETTEXT_DIR}
 
-deps : $(IRRLICHT_LIB) $(CURL_LIB) $(LEVELDB_LIB)		\
-	$(LUAJIT_LIB) $(VORBIS_LIB) $(MBEDTLS_LIB) iconv_download
+deps : $(IRRLICHT_LIB) $(CURL_LIB) $(LUAJIT_LIB) $(VORBIS_LIB) $(MBEDTLS_LIB) iconv_download
 
 clean_all :
 	$(RM) -r deps
