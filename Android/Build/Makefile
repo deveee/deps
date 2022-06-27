@@ -83,7 +83,7 @@ IRRLICHT_TIMESTAMP = $(IRRLICHT_DIR)/timestamp
 IRRLICHT_TIMESTAMP_INT = $(ANDR_ROOT)/deps/irrlicht_timestamp
 IRRLICHT_URL_HTTP = https://github.com/MoNTE48/Irrlicht/archive/$(IRRLICHT_BRANCH).zip
 
-MBEDTLS_VERSION = 2.16.5
+MBEDTLS_VERSION = 3.1.0
 MBEDTLS_DIR = $(ANDR_ROOT)/deps/mbedtls
 MBEDTLS_LIB = $(MBEDTLS_DIR)/libmbedtls.a
 MBEDTLS_TIMESTAMP = $(MBEDTLS_DIR)/timestamp
