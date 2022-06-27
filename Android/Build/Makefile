@@ -62,14 +62,6 @@ LEVELDB_TIMESTAMP = $(LEVELDB_DIR)/timestamp
 LEVELDB_TIMESTAMP_INT = $(ANDR_ROOT)/deps/leveldb_timestamp
 LEVELDB_URL = https://github.com/google/leveldb/archive/$(LEVELDB_VERSION).zip
 
-OPENAL_VERSION = v1.19
-#OPENAL_VERSION = f5e0eef34db3a3ab94b61a2f99f84f078ba947e7 # Release 1.20.1 has a broken sound
-OPENAL_DIR = $(ANDR_ROOT)/deps/openal-soft
-OPENAL_LIB = $(OPENAL_DIR)/libopenal.a
-OPENAL_TIMESTAMP = $(OPENAL_DIR)/timestamp
-OPENAL_TIMESTAMP_INT = $(ANDR_ROOT)/deps/openal_timestamp
-OPENAL_URL_GIT = https://github.com/kcat/openal-soft/
-
 VORBIS_DIR = $(ANDR_ROOT)/deps/libvorbis-android
 VORBIS_LIB = $(VORBIS_DIR)/obj/local/$(TARGET_ABI)/libvorbis.a
 VORBIS_TIMESTAMP = $(VORBIS_DIR)/timestamp
@@ -141,65 +133,6 @@ local.properties:
 		exit 1;															\
 	fi;																	\
 	echo "ndk.dir = $$ANDROID_NDK" > local.properties
-
-$(OPENAL_TIMESTAMP) : openal_download
-	@LAST_MODIF=$$(find ${OPENAL_DIR} -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" ");\
-	if [ $$(basename $$LAST_MODIF) != "timestamp" ] ; then				\
-		touch ${OPENAL_TIMESTAMP};										\
-	fi
-
-openal_download :
-	@if [ ! -d ${OPENAL_DIR} ] ; then									\
-		echo "openal sources missing, downloading...";					\
-		mkdir -p ${ANDR_ROOT}/deps;										\
-		cd ${ANDR_ROOT}/deps;											\
-		git clone --branch ${OPENAL_VERSION} ${OPENAL_URL_GIT}			\
-			openal-soft || exit 1;										\
-#		git clone ${OPENAL_URL_GIT} || exit 1;							\
-		cd ${OPENAL_DIR};												\
-#		git reset --hard ${OPENAL_VERSION};								\
-		sed '/CMAKE_FIND_ROOT_PATH / s/^/#/' -i XCompile-Android.txt;	\
-		sed '/CMAKE_C_COMPILER/ s/-gcc"/-clang"/' -i XCompile-Android.txt;\
-		sed '/CMAKE_CXX_COMPILER/ s/-g++"/-clang++"/' -i XCompile-Android.txt;\
-	fi
-
-openal : $(OPENAL_LIB)
-
-$(OPENAL_LIB): $(OPENAL_TIMESTAMP)
-	+@REFRESH=0;														\
-	if [ ! -e ${OPENAL_TIMESTAMP_INT} ] ; then							\
-		REFRESH=1;														\
-	fi;																	\
-	if [ ${OPENAL_TIMESTAMP} -nt ${OPENAL_TIMESTAMP_INT} ] ; then		\
-		REFRESH=1;														\
-	fi;																	\
-	if [ $$REFRESH -ne 0 ] ; then										\
-	echo "changed timestamp for openal detected building...";			\
-	cd ${OPENAL_DIR};													\
-	export TOOLCHAIN=${OPENAL_DIR}/TOOLCHAIN;							\
-	${ANDROID_NDK}/build/tools/make_standalone_toolchain.py				\
-		--arch ${TARGET_ARCH}											\
-		--api ${API}													\
-		--stl=${APP_STL_LIB}											\
-		--install-dir=$${TOOLCHAIN};									\
-	export PATH="$${TOOLCHAIN}/bin:$${PATH}";							\
-	cmake .																\
-		-DCMAKE_TOOLCHAIN_FILE=XCompile-Android.txt -DLIBTYPE=STATIC	\
-		-DCMAKE_C_FLAGS="${TARGET_CFLAGS_ADDON}"						\
-		-DCMAKE_CXX_FLAGS="${TARGET_CXXFLAGS_ADDON} -fPIC"				\
-		-DHOST=${CROSS_PREFIX} -DCMAKE_FIND_ROOT_PATH=$${TOOLCHAIN}		\
-		-DALSOFT_BACKEND_WAVE=FALSE										\
-		-DALSOFT_NO_CONFIG_UTIL=TRUE || exit 1;							\
-	$(MAKE) -s || exit 1;												\
-	touch ${OPENAL_TIMESTAMP};											\
-	touch ${OPENAL_TIMESTAMP_INT};										\
-	$(RM) -r $${TOOLCHAIN};												\
-	else																\
-		echo "nothing to be done for openal";							\
-	fi
-
-clean_openal :
-	$(RM) -r ${OPENAL_DIR}
 
 $(VORBIS_TIMESTAMP) : vorbis_download
 	@LAST_MODIF=$$(find ${VORBIS_DIR} -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" ");\
@@ -669,7 +602,7 @@ clean_getttext :
 	$(RM) -r ${GETTEXT_DIR}
 
 deps : $(IRRLICHT_LIB) $(FREETYPE_LIB) $(CURL_LIB) $(LEVELDB_LIB)		\
-	$(LUAJIT_LIB) $(OPENAL_LIB) $(VORBIS_LIB) $(MBEDTLS_LIB) iconv_download
+	$(LUAJIT_LIB) $(VORBIS_LIB) $(MBEDTLS_LIB) iconv_download
 
 clean_all :
 	$(RM) -r deps

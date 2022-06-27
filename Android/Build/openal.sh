@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 . sdk.sh
-OPENAL_VERSION=1.22.0
+OPENAL_VERSION=1.22.2
 
 mkdir -p deps; cd deps
 
