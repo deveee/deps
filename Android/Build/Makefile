@@ -62,9 +62,9 @@ SDL2_TIMESTAMP = $(SDL2_DIR)/timestamp
 SDL2_TIMESTAMP_INT = $(ANDR_ROOT)/deps/SDL2_timestamp
 SDL2_URL_HTTP = https://github.com/libsdl-org/SDL/archive/$(SDL2_BRANCH).zip
 
-IRRLICHT_BRANCH = ogl-es
+IRRLICHT_BRANCH = SDL2
 IRRLICHT_DIR = $(ANDR_ROOT)/deps/irrlicht
-IRRLICHT_LIB = $(IRRLICHT_DIR)/lib/Android/libIrrlicht.a
+IRRLICHT_LIB = $(IRRLICHT_DIR)/lib/Android-SDL2/$(TARGET_ABI)/libIrrlicht.a
 IRRLICHT_TIMESTAMP = $(IRRLICHT_DIR)/timestamp
 IRRLICHT_TIMESTAMP_INT = $(ANDR_ROOT)/deps/irrlicht_timestamp
 IRRLICHT_URL_HTTP = https://github.com/MoNTE48/Irrlicht/archive/$(IRRLICHT_BRANCH).zip
@@ -233,7 +233,8 @@ $(IRRLICHT_LIB): $(IRRLICHT_TIMESTAMP)
 	fi;																	\
 	if [ $$REFRESH -ne 0 ] ; then										\
 	echo "changed timestamp for irrlicht detected building...";			\
-	cd ${IRRLICHT_DIR}/source/Irrlicht/Android;							\
+	cd ${IRRLICHT_DIR}/source/Irrlicht/Android-SDL2;					\
+	export SDL2_PATH=$(SDL2_DIR);										\
 	export APP_PLATFORM=android-${API};									\
 	export TARGET_ABI=${TARGET_ABI};									\
 	${ANDROID_NDK}/ndk-build											\
