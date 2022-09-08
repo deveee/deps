@@ -55,6 +55,13 @@ APP_STL_LIB = libc++
 SHELL := /bin/bash
 ANDR_ROOT = $(shell pwd)
 
+SDL2_BRANCH = release-2.24.0
+SDL2_DIR = $(ANDR_ROOT)/deps/SDL2
+SDL2_LIB = $(SDL2_DIR)/libs/$(TARGET_ABI)/libSDL2.a
+SDL2_TIMESTAMP = $(SDL2_DIR)/timestamp
+SDL2_TIMESTAMP_INT = $(ANDR_ROOT)/deps/SDL2_timestamp
+SDL2_URL_HTTP = https://github.com/libsdl-org/SDL/archive/$(SDL2_BRANCH).zip
+
 IRRLICHT_BRANCH = ogl-es
 IRRLICHT_DIR = $(ANDR_ROOT)/deps/irrlicht
 IRRLICHT_LIB = $(IRRLICHT_DIR)/lib/Android/libIrrlicht.a
@@ -137,6 +144,60 @@ iconv_download :
 
 clean_iconv :
 	$(RM) -r ${ICONV_DIR}
+
+SDL2_download :
+	@if [ ! -d ${SDL2_DIR} ] ; then										\
+		echo "SDL2 sources missing, downloading...";					\
+		mkdir -p ${ANDR_ROOT}/deps;										\
+		cd deps;														\
+		wget ${SDL2_URL_HTTP} || exit 1;								\
+		unzip -q ${SDL2_BRANCH}.zip || exit 1;							\
+		$(RM) -r ${SDL2_BRANCH}.zip;									\
+		mv SDL-${SDL2_BRANCH} SDL2;										\
+	fi
+
+$(SDL2_TIMESTAMP) : SDL2_download
+	@LAST_MODIF=$$(find ${SDL2_DIR} -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" ");\
+	if [ $$(basename $$LAST_MODIF) != "timestamp" ] ; then				\
+		touch ${SDL2_TIMESTAMP};										\
+	fi
+
+SDL2 : $(SDL2_LIB)
+
+$(SDL2_LIB): $(SDL2_TIMESTAMP)
+	+@REFRESH=0;														\
+	if [ ! -e ${SDL2_TIMESTAMP_INT} ] ; then							\
+		REFRESH=1;														\
+	fi;																	\
+	if [ ! -e ${SDL2_LIB} ] ; then										\
+		REFRESH=1;														\
+	fi;																	\
+	if [ ${SDL2_TIMESTAMP} -nt ${SDL2_TIMESTAMP_INT} ] ; then			\
+		REFRESH=1;														\
+	fi;																	\
+	if [ $$REFRESH -ne 0 ] ; then										\
+	echo "changed timestamp for SDL2 detected building...";				\
+	cd ${SDL2_DIR};														\
+	export APP_PLATFORM=android-${API};									\
+	export TARGET_ABI=${TARGET_ABI};									\
+	export NDK_PROJECT_PATH=${SDL2_DIR};								\
+	${ANDROID_NDK}/ndk-build											\
+		APP_PLATFORM=android-${API}										\
+		TARGET_ABI=${TARGET_ABI}										\
+		APP_STL=${APP_STL}												\
+		COMPILER_VERSION=${COMPILER_VERSION}							\
+		TARGET_CPPFLAGS_ADDON="${TARGET_CXXFLAGS_ADDON}"				\
+		TARGET_CFLAGS_ADDON="${TARGET_CFLAGS_ADDON}"					\
+		APP_BUILD_SCRIPT=${SDL2_DIR}/Android.mk							\
+		NDK_APPLICATION_MK=${ANDR_ROOT}/Deps.mk || exit 1;				\
+	touch ${SDL2_TIMESTAMP};											\
+	touch ${SDL2_TIMESTAMP_INT};										\
+	else																\
+		echo "nothing to be done for SDL2";								\
+	fi
+
+clean_SDL2 :
+	$(RM) -r ${SDL2_DIR}
 
 irrlicht_download :
 	@if [ ! -d ${IRRLICHT_DIR} ] ; then									\
@@ -420,7 +481,8 @@ $(GETTEXT_LIB): $(GETTEXT_TIMESTAMP)
 clean_getttext :
 	$(RM) -r ${GETTEXT_DIR}
 
-deps : $(IRRLICHT_LIB) $(CURL_LIB) $(LUAJIT_LIB) $(MBEDTLS_LIB) iconv_download
+deps : $(SDL2_LIB) $(IRRLICHT_LIB) $(CURL_LIB) $(LUAJIT_LIB) \
+	$(MBEDTLS_LIB) iconv_download
 
 clean_all :
 	$(RM) -r deps
