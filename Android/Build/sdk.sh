@@ -6,7 +6,7 @@ export ANDROID_NDK="$(grep '^ndk\.dir' local.properties | sed 's/^.*=[[:space:]]
 
 if [ ! -d $ANDROID_NDK ] ; then
 	echo "Please specify path of ANDROID NDK"
-	echo "e.g. $HOME/Android/android-ndk-r21"
+	echo "e.g. $HOME/Android/android-ndk-r25"
 	read ANDROID_NDK
 	export ANDROID_NDK
 fi
@@ -20,22 +20,19 @@ echo "ndk.dir = $ANDROID_NDK" > local.properties
 
 if $ARM32 ; then
 	### toolchain config for ARMv7
-	export API=16
 	export TARGET_ABI=armeabi-v7a
 	export ANDROID_ABI="$TARGET_ABI with NEON"
 	export TARGET=armv7a-linux-androideabi
-	export CFLAGS="-Ofast -fvisibility=hidden -fexceptions -D__ANDROID_MIN_SDK_VERSION__=$API"
-	export CXXFLAGS="$CFLAGS -frtti"
 else
 	### toolchain config for ARM64
-	export API=21
 	export TARGET_ABI=arm64-v8a
 	export ANDROID_ABI=$TARGET_ABI
 	export TARGET=aarch64-linux-android
-	export CFLAGS="-Ofast -fvisibility=hidden -fexceptions -D__ANDROID_MIN_SDK_VERSION__=$API"
-	export CXXFLAGS="$CFLAGS -frtti"
 fi
 
+export API=21
+export CFLAGS="-Ofast -fvisibility=hidden -fexceptions -D__ANDROID_MIN_SDK_VERSION__=$API"
+export CXXFLAGS="$CFLAGS -frtti"
 export NATIVE_API_LEVEL="android-$API"
 
 echo "Configured for $TARGET_ABI"
