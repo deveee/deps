@@ -13,9 +13,9 @@ fi
 cd vorbis-src
 
 $ANDROID_NDK/ndk-build \
- APP_PLATFORM=android-"$API" \
- TARGET_ABI="$TARGET_ABI" \
- NDK_APPLICATION_MK="$ANDR_ROOT/Deps.mk"
+	APP_PLATFORM=android-"$API" \
+	TARGET_ABI="$TARGET_ABI" \
+	NDK_APPLICATION_MK="$ANDR_ROOT/Deps.mk"
 
 # update `include` folder
 rm -rf ../../../Vorbis/include/
