@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 . sdk.sh
-LEVELDB_VERSION=1.22
+LEVELDB_VERSION=1.23
 
 mkdir -p deps; cd deps
 
@@ -16,15 +16,19 @@ fi
 cd leveldb-src/build
 
 cmake .. -DANDROID_STL="c++_static" \
- -DANDROID_NATIVE_API_LEVEL="$NATIVE_API_LEVEL" \
- -DCMAKE_BUILD_TYPE=Release \
- -DANDROID_ABI="$ANDROID_ABI" \
- -DANDROID_PLATFORM="$API" \
- -DCMAKE_C_FLAGS="$CFLAGS" \
- -DCMAKE_CXX_FLAGS="$CXXFLAGS -fPIC" \
- -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK/build/cmake/android.toolchain.cmake"
+	-DANDROID_NATIVE_API_LEVEL="$NATIVE_API_LEVEL" \
+	-DANDROID_ABI="$ANDROID_ABI" \
+	-DANDROID_PLATFORM="$API" \
+	-DBUILD_SHARED_LIBS=OFF \
+	-DCMAKE_BUILD_TYPE=Release \
+	-DCMAKE_C_FLAGS="$CFLAGS" \
+	-DCMAKE_CXX_FLAGS="$CXXFLAGS -fPIC" \
+	-DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK/build/cmake/android.toolchain.cmake" \
+	-DLEVELDB_BUILD_TESTS=OFF \
+	-DLEVELDB_BUILD_BENCHMARKS=OFF \
+	-DLEVELDB_INSTALL=OFF
 
-cmake --build .
+cmake --build . -j
 
 # update `include` folder
 rm -rf ../../../../LevelDB/include/
