@@ -83,10 +83,6 @@ CURL_TIMESTAMP = $(CURL_DIR)/timestamp
 CURL_TIMESTAMP_INT = $(ANDR_ROOT)/deps/curl_timestamp
 CURL_URL_HTTP = https://curl.se/download/curl-$(CURL_VERSION).tar.bz2
 
-ICONV_VERSION = 1.16
-ICONV_DIR = $(ANDR_ROOT)/deps/libiconv
-ICONV_URL_HTTP = https://ftp.gnu.org/pub/gnu/libiconv/libiconv-$(ICONV_VERSION).tar.gz
-
 LUAJIT_VERSION = 2.1
 LUAJIT_DIR = $(ANDR_ROOT)/deps/luajit
 LUAJIT_LIB = $(LUAJIT_DIR)/src/libluajit.a
@@ -122,28 +118,6 @@ local.properties:
 		exit 1;															\
 	fi;																	\
 	echo "ndk.dir = $$ANDROID_NDK" > local.properties
-
-iconv_download :
-	@if [ ! -d ${ICONV_DIR} ] ; then									\
-		echo "iconv sources missing, downloading...";					\
-		mkdir -p ${ANDR_ROOT}/deps;										\
-		cd ${ANDR_ROOT}/deps;											\
-		wget ${ICONV_URL_HTTP} || exit 1;								\
-		tar -xzf libiconv-${ICONV_VERSION}.tar.gz || exit 1;			\
-		$(RM) -r libiconv-${ICONV_VERSION}.tar.gz;						\
-		mv libiconv-${ICONV_VERSION} libiconv;							\
-		cd libiconv;													\
-		export TOOLCHAIN=${ICONV_DIR}/TOOLCHAIN;						\
-		${ANDROID_NDK}/build/tools/make_standalone_toolchain.py			\
-			--arch ${TARGET_ARCH}										\
-			--api ${API}												\
-			--stl=${APP_STL_LIB}										\
-			--install-dir=$${TOOLCHAIN};								\
-		./configure || exit 1;											\
-	fi
-
-clean_iconv :
-	$(RM) -r ${ICONV_DIR}
 
 SDL2_download :
 	@if [ ! -d ${SDL2_DIR} ] ; then										\
@@ -483,7 +457,7 @@ clean_getttext :
 	$(RM) -r ${GETTEXT_DIR}
 
 deps : $(SDL2_LIB) $(IRRLICHT_LIB) $(CURL_LIB) $(LUAJIT_LIB) \
-	$(MBEDTLS_LIB) iconv_download
+	$(MBEDTLS_LIB)
 
 clean_all :
 	$(RM) -r deps
