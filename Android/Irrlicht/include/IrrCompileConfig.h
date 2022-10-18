@@ -54,14 +54,6 @@
 #ifdef NO_IRR_COMPILE_WITH_SDL_TEXTINPUT_
 #undef _IRR_COMPILE_WITH_SDL_TEXTINPUT_
 #endif
-
-//! Comment this line to compile without SDL mouse events
-//! This is for better compatibility with CIrrDeviceAndroid that doesn't send
-//! mouse events even for real USB mouse and it sends touch events instead
-#define _IRR_COMPILE_WITH_SDL_MOUSE_EVENTS_
-#ifdef NO_IRR_COMPILE_WITH_SDL_MOUSE_EVENTS_
-#undef _IRR_COMPILE_WITH_SDL_MOUSE_EVENTS_
-#endif
 #endif
 
 //! Comment this line to compile without the fallback console device.
@@ -847,7 +839,7 @@ ones. */
 /** bzip2 is superior to the original zip file compression modes, but requires
 a certain amount of memory for decompression and adds several files to the
 library. */
-#define _IRR_COMPILE_WITH_BZIP2_
+//#define _IRR_COMPILE_WITH_BZIP2_
 #ifdef NO_IRR_COMPILE_WITH_BZIP2_
 #undef _IRR_COMPILE_WITH_BZIP2_
 #endif
@@ -864,7 +856,7 @@ NOTE: You will also have to modify the Makefile or project files when changing t
 //! Define _IRR_COMPILE_WITH_LZMA_ if you want to use LZMA compressed zip files.
 /** LZMA is a very efficient compression code, known from 7zip. Irrlicht
 currently only supports zip archives, though. */
-#define _IRR_COMPILE_WITH_LZMA_
+//#define _IRR_COMPILE_WITH_LZMA_
 #ifdef NO_IRR_COMPILE_WITH_LZMA_
 #undef _IRR_COMPILE_WITH_LZMA_
 #endif
