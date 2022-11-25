@@ -24,10 +24,12 @@ fi
 
 make -j HOST_CC="$HOST_CC" \
         CC="$CC" \
+        TARGET_SYS="Android" \
         TARGET_STRIP="$STRIP" \
         TARGET_AR="$TOOLCHAIN/bin/llvm-ar rcus" \
         TARGET_FLAGS="$CFLAGS -fno-fast-math" \
-        BUILDMODE=static
+        XCFLAGS="-DLUAJIT_DISABLE_FFI" \
+        BUILDMODE="static"
 
 # update `src` folder
 rm -rf ../../../LuaJIT/src/*
